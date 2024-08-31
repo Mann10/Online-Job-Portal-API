@@ -4,33 +4,29 @@ from .models import JobModel
 class JobModelSerializer(serializers.ModelSerializer):
     class Meta:
         model=JobModel
-        fields='__all__'
-    
-    def __init__(self, instance=None, data=..., **kwargs):
-        super().__init__(instance, data, **kwargs)
-        request = self.context.get('request', None)
-        if request:
-            if request.method in ['POST']:
-                self.fields['company'].required = False
-
-            elif request.method in ['PUT', 'PATCH']:
-                self.fields.pop('company', None)
-
+        exclude=('company',)
+        #fields='__all__'
         
-    def validate(self, attrs):
-        print(attrs)
-        print(self.context['request'].user.is_employer)
+    def validate(self, attrs):  
         request = self.context.get('request')
-        print(request)
+        if not request:
+            raise serializers.ValidationError({"message": "Request context is missing."})
+
+    # Check if the user is authenticated
+        if not request.user.is_authenticated:
+            raise serializers.ValidationError({"message": "Authentication credentials were not provided."})
+    
         if not request.user.is_employer:
             raise serializers.ValidationError({"message":"Only employees could add job post."})
-        if 'company' in attrs:
-            print(attrs['company'])
-            if not attrs.get('company').is_employer:
+        
+        if 'company' in attrs:  
+            if not attrs['company'].is_employer:
                 raise serializers.ValidationError({'message':f'You are not alloweded to create a job posting. As your role is not employer.'})
-        return super().validate(attrs)
+        return attrs
 
     def create(self, validated_data):
         validated_data['company'] = self.context['request'].user
         return super().create(validated_data)
+    
+    
          

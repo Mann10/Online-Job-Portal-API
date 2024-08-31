@@ -3,10 +3,10 @@ from .views import JobView,JobSearch
 from rest_framework.routers import DefaultRouter
 
 router=DefaultRouter()
-router.register("",JobView)
+router.register("jobs",JobView)
 
 urlpatterns = [
-    path('jobs/',include(router.urls)),
+    path('',include(router.urls)),
     path('job/search/',JobSearch.as_view(),name='search'),
     
 ]

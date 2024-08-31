@@ -42,7 +42,7 @@ class ApplicationViewEmployer(APIView):
             return Response(ser.data,status.HTTP_200_OK)
         return Response({"message":"Sorry you cannot see job applicaions of the job postings that you haven't created"},status.HTTP_403_FORBIDDEN)
 
-#employer review signal           
+           
 class ApplicationDetailViewEmployer(APIView):
     authentication_classes=[JWTAuthentication]
     permission_classes=[IsAuthenticated]
